@@ -64,8 +64,11 @@ export default function Footer() {
                 <div className="max-w-7xl mx-auto px-4 md:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-400">
                     <span>© 2026 Zaqvo.Design & developed by <a href="https://techgraphicss.com" className="hover:text-primary transition-colors">Techgraphicss.com</a></span>
                     <div className="flex gap-5">
-                        <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
-                        <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
+                        {/* <a href="#" className="hover:text-primary transition-colors">Terms of Service</a> */}
+                        <a href="/terms" className="hover:text-primary transition-colors">
+                            Terms of Service
+                        </a>
+                        <a href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</a>
                     </div>
                 </div>
             </div>

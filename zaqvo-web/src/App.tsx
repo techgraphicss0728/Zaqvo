@@ -12,23 +12,66 @@ import CTABanner from './components/CTABanner'
 // Sections removed by user: Blog, ContactCTABar
 import Footer from './components/Footer'
 
+import Terms from './components/terms'
+import PrivacyPolicy from './components/PrivacyPolicy'
+
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+// function App() {
+//   return (
+//     <div className="min-h-screen">
+//       <Navbar />
+//       <main>
+//         <Hero />
+//         <Features />
+//         <About />
+//         <Services />
+//         <WhyChooseUs />
+//         <Products />
+//         <Testimonials />
+//         <Team />
+//         <CTABanner />
+//       </main>
+//       <Footer />
+//     </div>
+//   )
+// }
+
+// export default App
+
+
+
+function HomePage() {
+  return (
+    <>
+      <Hero />
+      <Features />
+      <About />
+      <Services />
+      <WhyChooseUs />
+      <Products />
+      <Testimonials />
+      <Team />
+      <CTABanner />
+    </>
+  )
+}
+
 function App() {
   return (
-    <div className="min-h-screen">
-      <Navbar />
-      <main>
-        <Hero />
-        <Features />
-        <About />
-        <Services />
-        <WhyChooseUs />
-        <Products />
-        <Testimonials />
-        <Team />
-        <CTABanner />
-      </main>
-      <Footer />
-    </div>
+    <BrowserRouter>
+      <div className="min-h-screen">
+        <Navbar />
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/terms" element={<Terms />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+          </Routes>
+        </main>
+        <Footer />
+      </div>
+    </BrowserRouter>
   )
 }
 
