@@ -6,21 +6,21 @@ import Autoplay from 'embla-carousel-autoplay'
 
 const testimonials = [
     {
-        name: 'Sarah Johnson',
+        name: 'Raju',
         role: 'Homeowner',
         avatar: 'https://placehold.co/60x60/257eb8/ffffff?text=SJ',
         quote: 'Zaqvo has completely transformed the water quality in our home. The difference in taste and clarity is remarkable. Our family feels healthier and more energized!',
         rating: 5,
     },
     {
-        name: 'Michael Chen',
+        name: 'Sai Kiran',
         role: 'Restaurant Owner',
         avatar: 'https://placehold.co/60x60/282e52/ffffff?text=MC',
         quote: 'As a restaurant owner, water quality is paramount. Zaqvo\'s commercial system has improved our food quality and our customers have noticed the difference.',
         rating: 5,
     },
     {
-        name: 'Emily Rodriguez',
+        name: 'Sai Prasad',
         role: 'Office Manager',
         avatar: 'https://placehold.co/60x60/257eb8/ffffff?text=ER',
         quote: 'The delivery service is incredibly reliable and the water quality is outstanding. Our employees love having access to pure, clean water throughout the day.',
