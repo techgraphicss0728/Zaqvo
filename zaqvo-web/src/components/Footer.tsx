@@ -14,14 +14,14 @@ export default function Footer() {
                         <img src={logoImg} alt="Zaqvo" className="h-10 w-auto object-contain" />
                     </a>
                     <p className="text-gray-500 text-sm leading-relaxed mb-5">
-                        Delivering pure, clean water solutions for healthier homes and businesses since 2010.
+                        Delivering pure, clean water solutions for healthier homes and businesses since 2025.
                     </p>
                     <div className="flex items-start gap-2 text-sm">
                         <Clock className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                         <div>
                             <div className="text-dark font-medium">Open Hours</div>
-                            <div className="text-gray-500">Mon–Fri: 8am – 6pm</div>
-                            <div className="text-gray-500">Sat–Sun: 9am – 4pm</div>
+                            <div className="text-gray-500">Mon–Fri: 5:30am – 11:30pm</div>
+                            <div className="text-gray-500">Sat–Sun: 5:30am – 11:30pm</div>
                         </div>
                     </div>
                     {/* Social Icons */}
@@ -53,7 +53,7 @@ export default function Footer() {
                         </li>
                         <li className="flex items-center gap-3">
                             <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-                            <a href="mailto:thandumahesh9@gmail.com" className="hover:text-primary transition-colors">thandumahesh9@gmail.com</a>
+                            <a href="mailto:support@zaqvo.com" className="hover:text-primary transition-colors">support@zaqvo.com</a>
                         </li>
                     </ul>
                 </div>
