@@ -21,6 +21,14 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
 
+    # SMS / BSNL bulk SMS settings
+    BSNL_SMS_API_URL: str = "https://bulksms.bsnl.in:5010/api/Send_SMS"
+    BSNL_SMS_HEADER: str = "EDTKIO"
+    BSNL_ENTITY_ID: str = "1401406300000046832"
+    BSNL_TEMPLATE_ID: str = "1407176362687428295"
+    BSNL_AUTH_TOKEN: str = ""
+    SMS_SENDER_NAME: str = "Zaqvo"
+
     CORS_ORIGINS: str = "http://localhost:3000,http://localhost:5173"
     RATE_LIMIT_PER_MINUTE: int = 120
 
