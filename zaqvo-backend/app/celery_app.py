@@ -9,7 +9,12 @@ celery_app = Celery(
     "zaqvo",
     broker=settings.CELERY_BROKER_URL,
     backend=settings.REDIS_URL,
-    include=["app.tasks"],
+    include=[
+        "app.workers.storage",
+        "app.workers.scheduled",
+        "app.workers.notifications",
+        "app.workers.orders",
+    ],
 )
 
 celery_app.conf.update(

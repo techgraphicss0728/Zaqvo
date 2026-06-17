@@ -1,58 +1,25 @@
-"""Shared dependencies: auth, DB session, etc."""
-from typing import Annotated, Literal
+"""Request helpers. JWT validation runs in AuthMiddleware; routes use request.state.user."""
+from typing import Literal
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-
-from app.core.security import decode_token
-
-security = HTTPBearer(auto_error=False)
+from fastapi import HTTPException, Request, status
 
 
-async def get_current_user(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)]
-):
-    if not credentials:
+def get_request_user(request: Request) -> dict:
+    """User dict from AuthMiddleware (sub, role, payload)."""
+    user = getattr(request.state, "user", None)
+    if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
-    payload = decode_token(credentials.credentials)
-    if not payload or payload.get("type") != "access":
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
-    return payload
+    return user
 
 
-async def get_current_user_optional(
-    credentials: Annotated[HTTPAuthorizationCredentials | None, Depends(security)]
-):
-    if not credentials:
-        return None
-    payload = decode_token(credentials.credentials)
-    if not payload or payload.get("type") != "access":
-        return None
-    return payload
-
-
-def _ensure_role(payload: dict, expected_role: Literal["customer", "driver", "admin"]) -> None:
-    role = payload.get("role")
-    if role != expected_role:
+def ensure_role(user: dict, expected: Literal["customer", "driver", "admin"]) -> None:
+    if user.get("role") != expected:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Forbidden for this role")
 
 
-async def get_current_customer(
-    payload: Annotated[dict, Depends(get_current_user)],
-):
-    _ensure_role(payload, "customer")
-    return payload
-
-
-async def get_current_driver(
-    payload: Annotated[dict, Depends(get_current_user)],
-):
-    _ensure_role(payload, "driver")
-    return payload
-
-
-async def get_current_admin(
-    payload: Annotated[dict, Depends(get_current_user)],
-):
-    _ensure_role(payload, "admin")
-    return payload
+def ensure_super_admin(user: dict) -> None:
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin role required")
+    payload = user.get("payload") or {}
+    if not bool(payload.get("is_super_admin", False)):
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Super admin access required")

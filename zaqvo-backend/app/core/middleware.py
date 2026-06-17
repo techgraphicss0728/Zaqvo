@@ -16,6 +16,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         request.state.request_id = request_id
         start = time.perf_counter()
         response = await call_next(request)
+        response.headers["X-Request-ID"] = request_id
         duration_ms = (time.perf_counter() - start) * 1000
         logger.info(
             "request",

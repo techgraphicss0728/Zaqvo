@@ -1,0 +1,12 @@
+"""Admin media endpoints for product image uploads."""
+from fastapi import APIRouter, File, UploadFile
+
+from app.services.media_service import media_service
+
+router = APIRouter()
+
+
+@router.post("/products/{product_id}/image")
+async def admin_upload_product_image(product_id: str, file: UploadFile = File(...)):
+    key, url = await media_service.upload_product_image(product_id=product_id, file=file)
+    return {"ok": True, "key": key, "url": url}

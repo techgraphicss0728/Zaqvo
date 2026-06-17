@@ -1,28 +1,70 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import img2L from '@/assets/2litre.png'
+import img5L from '@/assets/5litre.png'
+import img10L from '@/assets/10litre.png'
+import img1L from '@/assets/1litre.png'
+
+// const products = [
+//     {
+//         image: 'https://placehold.co/300x300/257eb8/ffffff?text=2L+Bottle',
+//         badge: '2L 3 Bottles',
+//         name: 'Mineral Water Bottle',
+//         // price: '$12.99',
+//         description: 'Premium mineral water with essential minerals. Perfect for daily hydration and healthy living.',
+//     },
+//     {
+//         image: 'https://placehold.co/300x300/282e52/ffffff?text=5L+Pack',
+//         badge: '5L 2 Bottles',
+//         name: 'Pure Spring Water Pack',
+//         // price: '$18.99',
+//         description: 'Natural spring water sourced from pristine mountain springs. Crisp, clean, and refreshing.',
+//     },
+//     {
+//         image: 'https://placehold.co/300x300/257eb8/ffffff?text=1L+6+Pack',
+//         badge: '1L 6 Bottles',
+//         name: 'Alkaline Water Bundle',
+//         // price: '$15.99',
+//         description: 'Alkaline water with a pH of 8.5+. Supports hydration and overall wellness.',
+//     },
+//     {
+//     image: 'https://source.unsplash.com/600x600/?water,can,container',
+//     badge: '10L Can',
+//     name: '10L Water Can',
+//     description:
+//       'Large 10L water can ideal for homes and offices. Clean, safe, and perfect for bulk usage.',
+//   },
+// ]
 
 const products = [
-    {
-        image: 'https://placehold.co/300x300/257eb8/ffffff?text=2L+Bottle',
-        badge: '2L 3 Bottles',
-        name: 'Mineral Water Bottle',
-        // price: '$12.99',
-        description: 'Premium mineral water with essential minerals. Perfect for daily hydration and healthy living.',
-    },
-    {
-        image: 'https://placehold.co/300x300/282e52/ffffff?text=5L+Pack',
-        badge: '5L 2 Bottles',
-        name: 'Pure Spring Water Pack',
-        // price: '$18.99',
-        description: 'Natural spring water sourced from pristine mountain springs. Crisp, clean, and refreshing.',
-    },
-    {
-        image: 'https://placehold.co/300x300/257eb8/ffffff?text=1L+6+Pack',
-        badge: '1L 6 Bottles',
-        name: 'Alkaline Water Bundle',
-        // price: '$15.99',
-        description: 'Alkaline water with a pH of 8.5+. Supports hydration and overall wellness.',
-    },
+  {
+    image: img2L,
+    badge: '2L 3 Bottles',
+    name: 'Mineral Water Bottle',
+    description:
+      'Premium mineral water with essential minerals. Perfect for daily hydration and healthy living.',
+  },
+  {
+    image: img5L,
+    badge: '5L 2 Bottles',
+    name: 'Pure Spring Water Pack',
+    description:
+      'Natural spring water sourced from pristine mountain springs. Crisp, clean, and refreshing.',
+  },
+  {
+    image: img1L,
+    badge: '1L 6 Bottles',
+    name: 'Water Bundle',
+    description:
+      'water supporting hydration and overall wellness.',
+  },
+  {
+    image: img10L,
+    badge: '10L Can',
+    name: '10L Water Can',
+    description:
+      'Large 10L water can ideal for homes and offices. Clean, safe, and perfect for bulk usage.',
+  },
 ]
 
 export default function Products() {
@@ -36,7 +78,7 @@ export default function Products() {
                     </h2>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {products.map((product) => (
                         <Card key={product.name} className="overflow-hidden group hover:shadow-xl transition-shadow duration-300">
                             <div className="relative overflow-hidden">

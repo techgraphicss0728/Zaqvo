@@ -71,7 +71,7 @@ export default function Footer() {
             {/* Bottom Bar */}
             <div className="border-t border-gray-200">
                 <div className="max-w-7xl mx-auto px-4 md:px-8 py-5 flex flex-col items-center gap-3 text-sm text-gray-400">
-                    <span className="text-center">© 2026 Zaqvo. Design & developed by <a href="https://techgraphicss.com" target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 hover:text-blue-700 transition-colors">techgraphicss.com</a></span>
+                    <span className="text-center">© 2026 Zaqvo. Design & developed by <a href="https://techgraphicss.com" target="_blank" rel="noopener noreferrer" className="font-bold text-blue-600 hover:text-blue-700 transition-colors">TechGraphicss</a></span>
                     <div className="flex gap-5">
                         <a href="/terms" className="hover:text-primary transition-colors">Terms of Service</a>
                         <a href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</a>

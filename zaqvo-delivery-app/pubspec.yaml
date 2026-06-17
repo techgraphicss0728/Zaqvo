@@ -15,11 +15,39 @@ dependencies:
   provider: ^6.1.2
   shared_preferences: ^2.3.3
   equatable: ^2.0.5
+  image_picker: ^1.1.2
+  url_launcher: ^6.3.1
+  flutter_native_splash: ^2.4.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
 
 flutter:
   uses-material-design: true
+  assets:
+    - lib/assets/LOGO_ZAQVO.png
+    - lib/assets/FEVICON_ZAQVO.png
+
+# dart run flutter_launcher_icons
+# dart run flutter_native_splash:create
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: lib/assets/FEVICON_ZAQVO.png
+  min_sdk_android: 21
+  remove_alpha_ios: true
+  adaptive_icon_background: "#E0F2FE"
+  adaptive_icon_foreground: lib/assets/FEVICON_ZAQVO.png
+
+flutter_native_splash:
+  color: "#0A4A7A"
+  image: lib/assets/FEVICON_ZAQVO.png
+  android: true
+  ios: true
+  web: false
+  android_12:
+    color: "#0A4A7A"
+    image: lib/assets/FEVICON_ZAQVO.png

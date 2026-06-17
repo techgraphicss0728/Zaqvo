@@ -36,7 +36,7 @@ class CustomerInDB(CustomerBase):
 class CustomerCreate(BaseModel):
     """Payload for creating a customer during signup."""
 
-    name: NameStr
+    name: Optional[NameStr] = None
     mobile_number: NonEmptyStr
     photo: Optional[str] = None
 

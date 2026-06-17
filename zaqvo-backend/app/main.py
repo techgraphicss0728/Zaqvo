@@ -11,10 +11,14 @@ from slowapi.errors import RateLimitExceeded
 
 from app.api.v1.router import api_router
 from app.core.config import settings
+from app.core.errors import register_exception_handlers
 from app.core.logging import setup_logging
 from app.core.limiter import limiter
+from app.core.auth_middleware import AuthMiddleware
 from app.core.middleware import RequestLoggingMiddleware
-from app.db.mongodb import connect_mongo, close_mongo
+from app.core.cache import close_redis, connect_redis
+from app.db.mongodb import close_mongo, connect_mongo
+from app.db.seed import seed_dashboard_defaults
 
 setup_logging()
 
@@ -22,11 +26,18 @@ setup_logging()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await connect_mongo()
+    await connect_redis()
+    await seed_dashboard_defaults()
     yield
+    await close_redis()
     await close_mongo()
 
 
 def create_application() -> FastAPI:
+    allowed_origins = [
+        origin.strip() for origin in settings.CORS_ORIGINS.split(",") if origin.strip()
+    ]
+
     app = FastAPI(
         title=settings.PROJECT_NAME,
         openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
@@ -37,15 +48,17 @@ def create_application() -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.CORS_ORIGINS,
+        allow_origins=allowed_origins,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
     app.add_middleware(RequestLoggingMiddleware)
+    app.add_middleware(AuthMiddleware)
 
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+    register_exception_handlers(app)
 
     app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 

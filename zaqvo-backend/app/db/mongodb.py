@@ -17,6 +17,20 @@ async def connect_mongo() -> None:
         serverSelectionTimeoutMS=5000,
     )
     _db = _client[settings.MONGODB_DB_NAME]
+    await _db["categories"].create_index("slug", unique=True)
+    await _db["categories"].create_index("name")
+    await _db["categories"].create_index("is_active")
+    await _db["products"].create_index("slug", unique=True)
+    await _db["products"].create_index("name")
+    await _db["products"].create_index("category_id")
+    await _db["products"].create_index("is_active")
+    await _db["products"].create_index("price")
+    await _db["admins"].create_index("mobile_number", unique=True)
+    await _db["admins"].create_index("is_active")
+    await _db["admins"].create_index("role_id")
+    await _db["admins"].create_index("role_slug")
+    await _db["roles"].create_index("slug", unique=True)
+    await _db["otps"].create_index([("mobile_number", 1), ("role", 1), ("purpose", 1)])
 
 
 async def close_mongo() -> None:

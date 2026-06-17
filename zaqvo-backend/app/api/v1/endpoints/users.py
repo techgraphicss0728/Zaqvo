@@ -1,25 +1,16 @@
-"""Users CRUD and profile (placeholder)."""
-from fastapi import APIRouter, Depends, HTTPException, Request
+"""Users profile (JWT validated in AuthMiddleware)."""
+from fastapi import APIRouter, Request
 
-from app.api.deps import get_current_user_optional
+from app.api.deps import get_request_user
 from app.core.limiter import limiter
-from app.models.user import UserResponse
+from app.schemas.profile import ProfileMeResponse
+from app.services.user_service import user_service
 
 router = APIRouter()
 
 
-@router.get("/me", response_model=UserResponse)
+@router.get("/me", response_model=ProfileMeResponse)
 @limiter.limit("60/minute")
-async def me(request: Request, current_user=Depends(get_current_user_optional)):
-    from datetime import datetime
-    if not current_user:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    # TODO: return real user from DB
-    sub = current_user.get("sub", "")
-    return UserResponse(
-        id="1",
-        email=sub if "@" in sub else f"{sub}@placeholder.local",
-        full_name=None,
-        role="customer",
-        created_at=datetime.utcnow(),
-    )
+async def me(request: Request):
+    user = get_request_user(request)
+    return await user_service.get_profile_me(user["role"], user.get("sub"))

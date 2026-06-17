@@ -26,14 +26,14 @@ export default function About() {
                         We Always Want Safe and Healthy Water for Healthy Life
                     </h2>
                     <p className="text-gray-500 leading-relaxed">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt
-                        ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                        ullamco laboris nisi ut aliquip ex ea commodo consequat.
+                        At ZAQVO, we are redefining the way water reaches your doorstep.
+                        We are a next-generation water delivery platform committed to providing pure, safe, and reliable drinking water—delivered to you within minutes. Our goal is simple: make access to clean water fast, convenient, and stress-free.
+                        With features like real-time order tracking, 24/7 service, and affordable subscription plans, ZAQVO ensures a seamless experience for every customer. We combine technology and efficiency to deliver not just water, but trust and reliability.
+                        We also care about the environment. That’s why we focus on eco-friendly packaging and sustainable practices to reduce our impact while maintaining high-quality service.
+                        Whether for your home or workplace, ZAQVO is your trusted partner for everyday hydration.
                     </p>
                     <p className="text-gray-500 leading-relaxed">
-                        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-                        nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-                        deserunt mollit anim id est laborum.
+                        ZAQVO – Pure Water. Instant Delivery.
                     </p>
 
                     {/* Stats */}

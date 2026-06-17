@@ -1,39 +1,46 @@
-import { NavLink } from 'react-router-dom'
-import { LayoutDashboard, FileBarChart, LineChart } from 'lucide-react'
+import { NavLinks } from './NavLinks'
+import { LogoMark } from './LogoMark'
 import { cn } from '@/lib/utils'
+import type { AuthUser } from '@/hooks/usePermissions'
 
-const nav = [
-  { to: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { to: '/reports', label: 'Reports', icon: FileBarChart },
-  { to: '/analytics', label: 'Analytics', icon: LineChart },
-]
+type Props = {
+  className?: string
+  collapsed?: boolean
+  user: AuthUser
+}
 
-export function Sidebar() {
+export function Sidebar({ className, collapsed = false, user }: Props) {
   return (
-    <aside className="flex w-64 flex-col border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
-      <div className="flex h-16 items-center border-b border-gray-200 px-6 dark:border-gray-800">
-        <span className="text-xl font-semibold">Zaqvo</span>
+    <aside
+      className={cn(
+        'flex shrink-0 flex-col border-r border-white/10 bg-[linear-gradient(180deg,hsl(var(--zaqvo-navy))_0%,hsl(var(--zaqvo-surface))_100%)] text-white transition-[width] duration-300',
+        collapsed ? 'w-[5.25rem]' : 'w-64',
+        className,
+      )}
+    >
+      <div
+        className={cn(
+          'flex min-h-16 items-center border-b border-white/10 py-3',
+          collapsed ? 'justify-center px-2' : 'px-4',
+        )}
+      >
+        {collapsed ? (
+          <div className="grid h-10 w-10 place-items-center rounded-lg bg-white/10 text-base font-bold">
+            Z
+          </div>
+        ) : (
+          <LogoMark maxWidth={176} />
+        )}
       </div>
-      <nav className="flex flex-1 flex-col gap-1 p-4">
-        {nav.map(({ to, label, icon: Icon }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                isActive
-                  ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-50'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50'
-              )
-            }
-          >
-            <Icon className="h-5 w-5" />
-            {label}
-          </NavLink>
-        ))}
-      </nav>
+      <NavLinks user={user} variant="shell" collapsed={collapsed} className="flex-1" />
+      <div
+        className={cn(
+          'border-t border-white/10 text-xs text-white/60',
+          collapsed ? 'p-3 text-center' : 'p-4',
+        )}
+      >
+        {collapsed ? user.roleSlug?.slice(0, 2) : user.roleName ?? user.roleSlug ?? 'Admin'}
+      </div>
     </aside>
   )
 }

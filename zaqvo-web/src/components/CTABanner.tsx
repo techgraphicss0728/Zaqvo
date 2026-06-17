@@ -91,7 +91,8 @@ export default function CTABanner() {
                                     size="lg"
                                     className="w-full bg-[#257eb8] hover:bg-[#1e6a9e] text-white font-bold text-base px-8 py-5 rounded-xl shadow-lg shadow-[#257eb8]/30 group transition-all duration-300 hover:shadow-[#257eb8]/50 hover:scale-[1.02]"
                                 >
-                                    Book a Call
+                                    <Phone className="mr-2 w-5 h-5" />
+                                    For Bookings
                                     <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                                 </Button>
                             </a>

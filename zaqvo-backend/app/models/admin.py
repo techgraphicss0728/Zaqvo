@@ -12,6 +12,11 @@ class AdminBase(BaseModel):
     name: NameStr
     mobile_number: NonEmptyStr
     otp_verified: bool = False
+    is_super_admin: bool = False
+    is_active: bool = True
+    role_id: str | None = None
+    role_slug: str | None = None
+    role_name: str | None = None
 
     @field_validator("mobile_number")
     @classmethod
@@ -28,6 +33,7 @@ class AdminInDB(AdminBase):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     last_login: Optional[datetime] = None
+    password_hash: Optional[str] = None
 
 
 class AdminCreate(BaseModel):
@@ -51,4 +57,5 @@ class AdminResponse(AdminBase):
     created_at: datetime
     updated_at: datetime
     last_login: Optional[datetime] = None
+    created_by: Optional[str] = None
 
