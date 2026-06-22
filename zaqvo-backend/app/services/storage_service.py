@@ -4,10 +4,13 @@ from __future__ import annotations
 from urllib.parse import quote
 
 import boto3
+import structlog
 from botocore.exceptions import BotoCoreError, ClientError
 from fastapi import HTTPException, UploadFile
 
 from app.core.config import settings
+
+logger = structlog.get_logger(__name__)
 
 
 class StorageService:
@@ -53,6 +56,55 @@ class StorageService:
         bucket = settings.S3_BUCKET_NAME
         return f"https://{bucket}.s3.{region}.amazonaws.com/{quote(key)}"
 
+    def presigned_get_url(self, key: str, *, expires: int | None = None) -> str:
+        """Temporary read URL for private bucket objects (used in API responses)."""
+        self._assert_ready()
+        ttl = expires if expires is not None else settings.S3_PRESIGNED_URL_EXPIRES_SECONDS
+        try:
+            return self._client().generate_presigned_url(
+                "get_object",
+                Params={"Bucket": settings.S3_BUCKET_NAME, "Key": key},
+                ExpiresIn=ttl,
+            )
+        except (BotoCoreError, ClientError) as exc:
+            error_code, error_message = self._aws_error_info(exc)
+            logger.warning(
+                "s3_presign_failed",
+                bucket=settings.S3_BUCKET_NAME,
+                key=key,
+                aws_error_code=error_code,
+                aws_error_message=error_message,
+            )
+            return self._public_url(key)
+
+    @staticmethod
+    def _aws_error_info(exc: BotoCoreError | ClientError) -> tuple[str | None, str | None]:
+        if isinstance(exc, ClientError):
+            err = exc.response.get("Error", {})
+            return err.get("Code"), err.get("Message")
+        return type(exc).__name__, str(exc)
+
+    def _raise_storage_error(
+        self,
+        *,
+        action: str,
+        key: str,
+        exc: BotoCoreError | ClientError,
+    ) -> None:
+        error_code, error_message = self._aws_error_info(exc)
+        logger.error(
+            "s3_operation_failed",
+            action=action,
+            bucket=settings.S3_BUCKET_NAME,
+            key=key,
+            aws_error_code=error_code,
+            aws_error_message=error_message,
+        )
+        detail = "Failed to upload image to storage"
+        if settings.DEBUG and error_code:
+            detail = f"{detail} ({error_code})"
+        raise HTTPException(status_code=502, detail=detail) from exc
+
     async def upload_product_image(
         self,
         *,
@@ -72,15 +124,23 @@ class StorageService:
                 ContentType=file.content_type or "application/octet-stream",
             )
         except (BotoCoreError, ClientError) as exc:
-            raise HTTPException(status_code=502, detail="Failed to upload image to storage") from exc
+            self._raise_storage_error(action="put_object", key=key, exc=exc)
         return key, self._public_url(key)
 
     def delete_object(self, key: str) -> None:
         self._assert_ready()
         try:
             self._client().delete_object(Bucket=settings.S3_BUCKET_NAME, Key=key)
-        except (BotoCoreError, ClientError):
-            # best effort; caller can queue background retry
+        except (BotoCoreError, ClientError) as exc:
+            error_code, error_message = self._aws_error_info(exc)
+            logger.warning(
+                "s3_operation_failed",
+                action="delete_object",
+                bucket=settings.S3_BUCKET_NAME,
+                key=key,
+                aws_error_code=error_code,
+                aws_error_message=error_message,
+            )
             raise
 
 

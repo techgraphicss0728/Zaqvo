@@ -9,7 +9,7 @@ import { setAdminToken } from '@/lib/auth-store'
 import { ApiError } from '@/lib/api-client'
 import { sendAdminLoginOtp, verifyAdminLoginOtp } from '@/lib/admin-auth-api'
 import { authUserFromApi, type AuthUser } from '@/hooks/usePermissions'
-import { useToast } from '@/hooks/useToast'
+import { notifyError, notifyInfo, notifySuccess } from '@/lib/notify'
 
 export type LoginUser = AuthUser
 
@@ -20,7 +20,6 @@ type Props = {
 type LoginStep = 'mobile' | 'otp'
 
 export function LoginPage({ onLogin }: Props) {
-  const { toast } = useToast()
   const [step, setStep] = useState<LoginStep>('mobile')
   const [phone, setPhone] = useState('')
   const [otp, setOtp] = useState('')
@@ -31,7 +30,7 @@ export function LoginPage({ onLogin }: Props) {
 
   const sendOtp = async () => {
     if (!canSendOtp) {
-      toast('Enter a valid 10-digit mobile number.', 'error')
+      notifyError('Enter a valid 10-digit mobile number.')
       return
     }
 
@@ -41,15 +40,14 @@ export function LoginPage({ onLogin }: Props) {
       setStep('otp')
       setOtp('')
       if (response.dev_mode) {
-        toast(
+        notifyInfo(
           'Development mode: SMS not sent. Check the API terminal (uvicorn) for your OTP, or set BSNL_AUTH_TOKEN in .env for real SMS.',
-          'info',
         )
       } else {
-        toast('OTP sent to your mobile number. Valid for 5 minutes.', 'success')
+        notifySuccess('OTP sent to your mobile number. Valid for 5 minutes.')
       }
     } catch (e) {
-      toast(e instanceof ApiError ? e.message : 'Unable to send OTP. Please try again.', 'error')
+      notifyError(e instanceof ApiError ? e.message : 'Unable to send OTP. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -57,7 +55,7 @@ export function LoginPage({ onLogin }: Props) {
 
   const verifyOtp = async () => {
     if (!canVerifyOtp) {
-      toast('Enter the OTP sent to your mobile number.', 'error')
+      notifyError('Enter the OTP sent to your mobile number.')
       return
     }
 
@@ -65,10 +63,10 @@ export function LoginPage({ onLogin }: Props) {
     try {
       const response = await verifyAdminLoginOtp({ mobile_number: phone, otp: otp.trim() })
       setAdminToken(response.access_token)
-      toast('Login successful. Welcome back!', 'success')
+      notifySuccess('Login successful. Welcome back!')
       onLogin(authUserFromApi(response.admin))
     } catch (e) {
-      toast(e instanceof ApiError ? e.message : 'OTP verification failed. Please try again.', 'error')
+      notifyError(e instanceof ApiError ? e.message : 'OTP verification failed. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -79,12 +77,12 @@ export function LoginPage({ onLogin }: Props) {
     try {
       const response = await sendAdminLoginOtp({ mobile_number: phone })
       if (response.dev_mode) {
-        toast('Development mode: check the API terminal for the new OTP.', 'info')
+        notifyInfo('Development mode: check the API terminal for the new OTP.')
       } else {
-        toast('A new OTP has been sent to your mobile number.', 'success')
+        notifySuccess('A new OTP has been sent to your mobile number.')
       }
     } catch (e) {
-      toast(e instanceof ApiError ? e.message : 'Unable to resend OTP.', 'error')
+      notifyError(e instanceof ApiError ? e.message : 'Unable to resend OTP.')
     } finally {
       setLoading(false)
     }

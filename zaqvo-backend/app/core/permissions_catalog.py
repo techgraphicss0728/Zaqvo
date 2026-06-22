@@ -26,7 +26,7 @@ DASHBOARD_PAGES: tuple[PageDefinition, ...] = (
     {"key": "payments", "label": "Payments", "path": "/payments", "buttons": ["export"]},
     {"key": "collections", "label": "Collections", "path": "/collections", "buttons": []},
     {"key": "orders", "label": "Orders", "path": "/orders", "buttons": ["assign_driver", "cancel"]},
-    {"key": "catalog", "label": "Categories", "path": "/catalog", "buttons": []},
+    {"key": "catalog", "label": "Categories", "path": "/catalog", "buttons": ["upload_image"]},
     {"key": "products", "label": "Products", "path": "/products", "buttons": ["upload_image"]},
     {"key": "drivers", "label": "Drivers", "path": "/drivers", "buttons": ["verify"]},
     {"key": "approvals", "label": "Approvals", "path": "/approvals", "buttons": ["approve", "reject"]},

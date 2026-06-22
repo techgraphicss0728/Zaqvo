@@ -52,7 +52,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = 120
 
     # S3 uploads
-    S3_BUCKET_NAME: str = "zaqvo-uploads"
+    S3_BUCKET_NAME: str = "zaqvo"
     S3_REGION: str = "ap-south-1"
     S3_ACCESS_KEY_ID: str = ""
     S3_SECRET_ACCESS_KEY: str = ""

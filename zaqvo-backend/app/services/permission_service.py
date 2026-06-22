@@ -44,7 +44,7 @@ class PermissionService:
         permissions: dict[str, Any],
         *,
         page_key: str,
-        action: str,
+        action: str = "view",
         button_key: str | None = None,
     ) -> bool:
         if not permissions:

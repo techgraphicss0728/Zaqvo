@@ -147,7 +147,7 @@ export default function App() {
         <Route path="collections" element={user ? <ProtectedPage user={user} path="/collections"><CollectionsPage /></ProtectedPage> : null} />
         <Route path="orders" element={user ? <ProtectedPage user={user} path="/orders"><OrdersPage /></ProtectedPage> : null} />
         <Route path="products" element={user ? <ProtectedPage user={user} path="/products"><ProductListingPage /></ProtectedPage> : null} />
-        <Route path="catalog" element={user ? <ProtectedPage user={user} path="/catalog"><CatalogPage /></ProtectedPage> : null} />
+        <Route path="catalog" element={user ? <ProtectedPage user={user} path="/catalog"><CatalogPage user={user} /></ProtectedPage> : null} />
         <Route path="catalog/listing" element={<Navigate to="/products" replace />} />
         <Route path="drivers" element={user ? <ProtectedPage user={user} path="/drivers"><DriversPage /></ProtectedPage> : null} />
         <Route path="approvals" element={user ? <ProtectedPage user={user} path="/approvals"><ApprovalsPage /></ProtectedPage> : null} />
