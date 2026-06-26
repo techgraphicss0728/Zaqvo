@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:zaqvo_customer_app/core/router/app_routes.dart';
@@ -17,21 +19,50 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _mobileController = TextEditingController();
 
+  bool get _isMobileComplete =>
+      RegExp(r'^\d{10}$').hasMatch(_mobileController.text.trim());
+
+  @override
+  void initState() {
+    super.initState();
+    _mobileController.addListener(_onMobileChanged);
+  }
+
+  void _onMobileChanged() => setState(() {});
+
   @override
   void dispose() {
+    _mobileController.removeListener(_onMobileChanged);
     _mobileController.dispose();
     super.dispose();
   }
 
-  void _onContinue() {
+  Future<void> _onContinue() async {
+    final appState = context.read<AppState>();
+    if (appState.isBusy) return;
     if (!_formKey.currentState!.validate()) return;
     final mobile = _mobileController.text.trim();
-    context.push('${AppRoutes.otp}?mobile=${Uri.encodeComponent(mobile)}');
+
+    final sent = await appState.sendLoginOtp('91$mobile');
+    if (!mounted) return;
+    if (sent) {
+      context.push('${AppRoutes.otp}?mobile=${Uri.encodeComponent(mobile)}');
+    } else {
+      final message = appState.statusMessage?.trim();
+      Fluttertoast.showToast(
+        msg: (message != null && message.isNotEmpty)
+            ? message
+            : 'Unable to send OTP. Please try again.',
+        gravity: ToastGravity.BOTTOM,
+      );
+      appState.clearStatusMessage();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    context.watch<AppState>();
+    final appState = context.watch<AppState>();
+    final canContinue = _isMobileComplete && !appState.isBusy;
 
     return Scaffold(
       body: Container(
@@ -101,7 +132,11 @@ class _LoginPageState extends State<LoginPage> {
                                 const SizedBox(height: 8),
                                 TextFormField(
                                   controller: _mobileController,
-                                  keyboardType: TextInputType.phone,
+                                  keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(10),
+                                  ],
                                   decoration: InputDecoration(
                                     hintText: '+91 1234567894',
                                     hintStyle:
@@ -132,46 +167,62 @@ class _LoginPageState extends State<LoginPage> {
                                     ),
                                   ),
                                   validator: (value) {
-                                    final phone =
-                                        value?.replaceAll(RegExp(r'\D'), '');
-                                    if (phone == null || phone.length < 10) {
-                                      return 'Enter a valid mobile number';
+                                    final phone = (value ?? '').trim();
+                                    if (phone.length != 10 ||
+                                        !RegExp(r'^\d{10}$').hasMatch(phone)) {
+                                      return 'Enter a valid 10-digit mobile number';
                                     }
                                     return null;
                                   },
                                 ),
                                 const SizedBox(height: 20),
-                                SizedBox(
-                                  width: double.infinity,
-                                  child: DecoratedBox(
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [
-                                          Color(0xFF6AAFD6),
-                                          Color(0xFF8DCEE8)
-                                        ],
-                                      ),
-                                      borderRadius: BorderRadius.circular(30),
-                                    ),
-                                    child: FilledButton(
-                                      onPressed: _onContinue,
-                                      style: FilledButton.styleFrom(
-                                        backgroundColor: Colors.transparent,
-                                        shadowColor: Colors.transparent,
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 14),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
+                                Opacity(
+                                  opacity: canContinue || appState.isBusy ? 1 : 0.45,
+                                  child: SizedBox(
+                                    width: double.infinity,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        gradient: const LinearGradient(
+                                          colors: [
+                                            Color(0xFF6AAFD6),
+                                            Color(0xFF8DCEE8)
+                                          ],
                                         ),
+                                        borderRadius: BorderRadius.circular(30),
                                       ),
-                                      child: const Text(
-                                        'Continue →',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
+                                      child: FilledButton(
+                                        onPressed: canContinue ? _onContinue : null,
+                                        style: FilledButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          shadowColor: Colors.transparent,
+                                          disabledBackgroundColor:
+                                              Colors.transparent,
+                                          disabledForegroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 14),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                          ),
                                         ),
+                                        child: appState.isBusy
+                                            ? const SizedBox(
+                                                width: 22,
+                                                height: 22,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            : const Text(
+                                                'Continue →',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
                                       ),
                                     ),
                                   ),

@@ -82,7 +82,7 @@ async def send_otp_sms(mobile_number: str, otp: str, tpid: str | None = None) ->
     }
 
     try:
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(timeout=15) as client:
             response = await client.post(api_url, json=payload, headers=headers)
 
         if response.status_code != 200:

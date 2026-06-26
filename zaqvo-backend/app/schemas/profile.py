@@ -1,7 +1,18 @@
 """Authenticated user profile responses."""
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
+
+
+class FcmTokenRequest(BaseModel):
+    """Body for registering the logged-in user's FCM device token."""
+
+    fcm_token: str = Field(..., min_length=1, max_length=4096)
+
+    @field_validator("fcm_token")
+    @classmethod
+    def strip_token(cls, v: str) -> str:
+        return v.strip()
 
 
 class ProfileMeResponse(BaseModel):

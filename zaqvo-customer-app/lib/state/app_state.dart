@@ -1,5 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show ChangeNotifier, debugPrint;
 import 'package:zaqvo_customer_app/core/errors/error_mapper.dart';
+import 'package:zaqvo_customer_app/core/services/fcm_service.dart';
+import 'package:zaqvo_customer_app/core/storage/secure_storage_service.dart';
+import 'package:zaqvo_customer_app/data/auth/auth_api.dart';
 import 'package:zaqvo_customer_app/data/repositories/customer_repository.dart';
 import 'package:zaqvo_customer_app/domain/models/app_user.dart';
 import 'package:zaqvo_customer_app/domain/models/bootstrap_data.dart';
@@ -12,9 +17,22 @@ import 'package:zaqvo_customer_app/domain/models/saved_address.dart';
 import 'package:zaqvo_customer_app/domain/models/scheduled_delivery.dart';
 
 class AppState extends ChangeNotifier {
-  AppState(this._repository);
+  AppState(
+    this._repository, {
+    required AuthApi authApi,
+    required SecureStorageService secureStorage,
+    required FcmService fcmService,
+  })  : _authApi = authApi,
+        _secureStorage = secureStorage,
+        _fcmService = fcmService;
+
+  static const _kAccessTokenKey = 'auth_access_token';
+  static const _kRefreshTokenKey = 'auth_refresh_token';
 
   final CustomerRepository _repository;
+  final AuthApi _authApi;
+  final SecureStorageService _secureStorage;
+  final FcmService _fcmService;
 
   bool _isInitialized = false;
   bool _isInitializing = false;
@@ -135,20 +153,78 @@ class AppState extends ChangeNotifier {
     _isInitializing = false;
   }
 
-  Future<bool> signIn({
-    required String email,
-    required String password,
-  }) async {
+  /// Requests a login OTP for any mobile number (new users are created on the server).
+  Future<bool> sendLoginOtp(String mobileNumber) async {
     var success = false;
     await _runBusyAction(() async {
-      _currentUser = await _repository.signIn(email: email, password: password);
+      await _authApi.sendLoginOtp(mobileNumber);
       success = true;
     });
     return success;
   }
 
+  /// Verifies the entered OTP. On success the JWT pair is stored, the profile
+  /// is loaded, and (best-effort) the FCM token is registered. Returns `false`
+  /// on a wrong/expired OTP, with [statusMessage] describing why.
+  Future<bool> verifyLoginOtp({
+    required String mobileNumber,
+    required String otp,
+  }) async {
+    var success = false;
+    await _runBusyAction(() async {
+      final tokens = await _authApi.verifyLoginOtp(
+        mobileNumber: mobileNumber,
+        otp: otp,
+      );
+      await _secureStorage.write(
+        key: _kAccessTokenKey,
+        value: tokens.accessToken,
+      );
+      await _secureStorage.write(
+        key: _kRefreshTokenKey,
+        value: tokens.refreshToken,
+      );
+
+      final profile = await _authApi.fetchProfile(tokens.accessToken);
+      _currentUser = AppUser(
+        id: profile.id,
+        name: (profile.name?.trim().isNotEmpty ?? false)
+            ? profile.name!.trim()
+            : 'Customer',
+        email: '',
+        membershipTier: 'Member',
+        phoneNumber: profile.mobileNumber ?? mobileNumber,
+      );
+      success = true;
+    });
+
+    if (success) {
+      unawaited(_registerFcmToken());
+    }
+    return success;
+  }
+
+  /// Stores the logged-in user's FCM device token on their backend record.
+  /// Never throws — notification delivery is non-critical to the login flow.
+  Future<void> _registerFcmToken() async {
+    try {
+      final accessToken = await _secureStorage.read(_kAccessTokenKey);
+      if (accessToken == null || accessToken.isEmpty) return;
+      final fcmToken = await _fcmService.getToken();
+      if (fcmToken == null || fcmToken.isEmpty) return;
+      await _authApi.registerFcmToken(
+        accessToken: accessToken,
+        fcmToken: fcmToken,
+      );
+    } catch (error) {
+      debugPrint('FCM token registration skipped: $error');
+    }
+  }
+
   void signOut() {
     _currentUser = null;
+    unawaited(_secureStorage.delete(_kAccessTokenKey));
+    unawaited(_secureStorage.delete(_kRefreshTokenKey));
     notifyListeners();
   }
 

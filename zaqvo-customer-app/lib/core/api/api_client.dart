@@ -4,8 +4,9 @@ import 'package:zaqvo_customer_app/core/config/app_config.dart';
 Dio createApiClient(AppConfig config) {
   final dio = Dio(BaseOptions(
     baseUrl: config.apiBaseUrl,
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 15),
+    connectTimeout: const Duration(seconds: 15),
+    receiveTimeout: const Duration(seconds: 30),
+    sendTimeout: const Duration(seconds: 30),
     headers: {'Accept': 'application/json', 'Content-Type': 'application/json'},
   ));
   dio.interceptors.add(InterceptorsWrapper(

@@ -1,5 +1,5 @@
 """Auth: OTP login/signup for mobile apps; OTP-only login for admin dashboard."""
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, BackgroundTasks, Request, Response
 
 from app.api.helpers.auth_cookies import clear_auth_cookies, set_auth_cookies
 from app.core.config import settings
@@ -17,6 +17,7 @@ from app.schemas.auth import (
 )
 from app.services.admin_auth_service import admin_auth_service
 from app.services.auth_service import auth_service
+from app.services.customer_auth_service import customer_auth_service
 
 router = APIRouter()
 
@@ -98,14 +99,18 @@ async def admin_signup_verify_otp(request: Request, body: OTPVerifyRequest):
 
 @router.post("/customer/login/send-otp", response_model=OtpMessageResponse)
 @limiter.limit("10/minute")
-async def customer_login_send_otp(request: Request, body: LoginOTPRequest):
-    return await auth_service.customer_login_send_otp(body)
+async def customer_login_send_otp(
+    request: Request,
+    body: LoginOTPRequest,
+    background_tasks: BackgroundTasks,
+):
+    return await customer_auth_service.login_send_otp(body, background_tasks)
 
 
 @router.post("/customer/login/verify-otp", response_model=TokenResponse)
 @limiter.limit("20/minute")
 async def customer_login_verify_otp(request: Request, body: OTPVerifyRequest):
-    return await auth_service.customer_login_verify_otp(body)
+    return await customer_auth_service.login_verify_otp(body)
 
 
 @router.post("/driver/login/send-otp", response_model=OtpMessageResponse)

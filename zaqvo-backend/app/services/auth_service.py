@@ -202,16 +202,6 @@ class AuthService:
     async def admin_signup_verify_otp(self, body: OTPVerifyRequest) -> TokenResponse:
         return await self._verify_otp_for_role(role="admin", body=body, purpose="signup")
 
-    async def customer_login_send_otp(self, body: LoginOTPRequest) -> dict:
-        return await self._login_send_otp(
-            role="customer",
-            body=body,
-            not_found_detail="Customer not found or not verified",
-        )
-
-    async def customer_login_verify_otp(self, body: OTPVerifyRequest) -> TokenResponse:
-        return await self._verify_otp_for_role(role="customer", body=body, purpose="login")
-
     async def driver_login_send_otp(self, body: LoginOTPRequest) -> dict:
         return await self._login_send_otp(
             role="driver",

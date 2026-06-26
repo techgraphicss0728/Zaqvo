@@ -1,4 +1,4 @@
-package com.example.zaqvo_customer_app
+package com.zaqvo
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:zaqvo_customer_app/core/theme/app_colors.dart';
 import 'package:zaqvo_customer_app/shared/widgets/app_logo.dart';
@@ -23,21 +25,41 @@ class _OtpPageState extends State<OtpPage> {
     super.dispose();
   }
 
+  String get _apiMobile => '91${widget.mobile.replaceAll(RegExp(r"\D"), '')}';
+
   Future<void> _verify() async {
     if (!_formKey.currentState!.validate()) return;
     final appState = context.read<AppState>();
-    final success = await appState.signIn(
-      email: '${widget.mobile.replaceAll(RegExp(r"\D"), '')}@zaqvo.app',
-      password: _otpController.text.trim(),
+    final success = await appState.verifyLoginOtp(
+      mobileNumber: _apiMobile,
+      otp: _otpController.text.trim(),
     );
 
     if (!mounted) return;
-    if (!success && (appState.statusMessage?.isNotEmpty ?? false)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(appState.statusMessage!)),
+    if (!success) {
+      Fluttertoast.showToast(
+        msg: appState.statusMessage?.isNotEmpty ?? false
+            ? appState.statusMessage!
+            : 'Incorrect OTP. Please try again.',
+        gravity: ToastGravity.BOTTOM,
       );
       appState.clearStatusMessage();
     }
+    // On success, the router redirect sends the now-authenticated user home.
+  }
+
+  Future<void> _resendOtp() async {
+    final appState = context.read<AppState>();
+    if (appState.isBusy) return;
+    final sent = await appState.sendLoginOtp(_apiMobile);
+    if (!mounted) return;
+    Fluttertoast.showToast(
+      msg: sent
+          ? 'OTP resent'
+          : (appState.statusMessage ?? 'Unable to resend OTP.'),
+      gravity: ToastGravity.BOTTOM,
+    );
+    if (!sent) appState.clearStatusMessage();
   }
 
   @override
@@ -116,7 +138,7 @@ class _OtpPageState extends State<OtpPage> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  "We've sent a 4-digit code to\nyour Mobile Number",
+                                  "We've sent a 6-digit code to\nyour Mobile Number",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                     color: Colors.black.withValues(alpha: 0.5),
@@ -126,14 +148,18 @@ class _OtpPageState extends State<OtpPage> {
                                 const SizedBox(height: 18),
                                 TextFormField(
                                   controller: _otpController,
-                                  maxLength: 4,
+                                  maxLength: 6,
                                   textAlign: TextAlign.center,
                                   keyboardType: TextInputType.number,
+                                  inputFormatters: [
+                                    FilteringTextInputFormatter.digitsOnly,
+                                    LengthLimitingTextInputFormatter(6),
+                                  ],
                                   decoration:
                                       const InputDecoration(counterText: ''),
                                   validator: (value) {
-                                    if ((value ?? '').trim().length != 4) {
-                                      return 'Enter 4-digit OTP';
+                                    if ((value ?? '').trim().length != 6) {
+                                      return 'Enter 6-digit OTP';
                                     }
                                     return null;
                                   },
@@ -189,11 +215,7 @@ class _OtpPageState extends State<OtpPage> {
                                 ),
                                 const SizedBox(height: 14),
                                 TextButton(
-                                  onPressed: () {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('OTP resent')),
-                                    );
-                                  },
+                                  onPressed: appState.isBusy ? null : _resendOtp,
                                   child: const Text(
                                     'Resend OTP',
                                     style: TextStyle(

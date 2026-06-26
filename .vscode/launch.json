@@ -1,0 +1,48 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "zaqvo-customer-app",
+            "cwd": "zaqvo-customer-app",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "zaqvo-customer-app (profile mode)",
+            "cwd": "zaqvo-customer-app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "zaqvo-customer-app (release mode)",
+            "cwd": "zaqvo-customer-app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "zaqvo-delivery-app",
+            "cwd": "zaqvo-delivery-app",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "zaqvo-delivery-app (profile mode)",
+            "cwd": "zaqvo-delivery-app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "zaqvo-delivery-app (release mode)",
+            "cwd": "zaqvo-delivery-app",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        }
+    ]
+}

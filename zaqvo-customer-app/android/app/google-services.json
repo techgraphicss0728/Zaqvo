@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1027846515874",
+    "project_id": "zaqvo-c91da",
+    "storage_bucket": "zaqvo-c91da.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1027846515874:android:80a11423f0c7977e7cbbfb",
+        "android_client_info": {
+          "package_name": "com.zaqvo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCnZSjRflhweKgQb2CV_F8IVJ6M15Zn5-8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

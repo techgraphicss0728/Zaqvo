@@ -52,6 +52,28 @@ class UserService:
             ),
         )
 
+    async def update_fcm_token(self, role: str, sub: str | None, fcm_token: str) -> dict:
+        """Persist the FCM device token on the authenticated user's document."""
+        if not sub:
+            raise HTTPException(status_code=401, detail="Not authenticated")
+        try:
+            oid = ObjectId(sub)
+        except InvalidId as e:
+            raise HTTPException(status_code=400, detail="Invalid user id") from e
+
+        db = get_db()
+        if db is None:
+            raise HTTPException(status_code=500, detail="Database not initialized")
+
+        result = await db[_collection_for_role(role)].update_one(
+            {"_id": oid},
+            {"$set": {"fcm_token": fcm_token, "updated_at": datetime.utcnow()}},
+        )
+        if result.matched_count == 0:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        return {"ok": True}
+
 
 user_service = UserService()
 
